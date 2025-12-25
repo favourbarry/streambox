@@ -1,18 +1,21 @@
-const knex = require("knex")(require("../../knexfile").development);
+const { Livestream } = require("../models/livestream");
+const { Like } = require("../models/like");
+const { Comment } = require("../models/comment");
+const { WatchHistory } = require("../models/watchHistory");
 
 //like / unlike video
 exports.toogleLike = async (req, res) => {
     try{
         const {videoId} = req.params; 
-        const existing = await knex("likes")
+        const existing = await Like.query()
         .where({ user_id: req.user.id, video_id: videoId})
         .first();
 
         if(existing){
-            await knex("likes").where({ user_id: req.user.id, video_id: videoId }).del();
+            await Like.query().where({ user_id: req.user.id, video_id: videoId }).delete();
             return res.json({message: "video unliked"});
         }
-            await knex("likes").insert({ user_id: req.user.id, video_id: videoId});
+            await Like.query().insert({ user_id: req.user.id, video_id: videoId});
             return res.json({message: "video liked"});
 
     }   catch (err){

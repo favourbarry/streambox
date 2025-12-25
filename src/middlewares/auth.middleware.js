@@ -20,3 +20,16 @@ module.exports = function (req, res, next) {
         return res.status(401).json({message: "Invalid token"});
     }
 };
+exports.authenticate = (req, res, next) =>{
+    if(req.user.role !== "owner"){
+        return res.status(403).json({ message: "unauthorized"});
+        next();
+    };
+}
+ exports.isOwner = (req, res, next) => {
+    if(req.user.role !== "owner"){
+        return res.status(403).json({message: "Forbidden"});
+    }
+    next();
+ };
+ 
