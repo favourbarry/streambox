@@ -1,10 +1,14 @@
-const { Livestream } = require("../models/livestream");
-const { Like } = require("../models/like");
-const { Comment } = require("../models/comment");
-const { WatchHistory } = require("../models/watchHistory");
+import { Livestream } from "../models/livestream.js";
+import { Like } from "../models/like.js";
+import { Comment } from "../models/comment.js";
+import { WatchHistory } from "../models/watchHistory.js";
+import knex from "knex";
+import knexConfig from "../../knexfile.js";
+
+const db = knex(knexConfig.development);
 
 //like / unlike video
-exports.toogleLike = async (req, res) => {
+export const toogleLike = async (req, res) => {
     try{
         const {videoId} = req.params; 
         const existing = await Like.query()
@@ -27,10 +31,10 @@ exports.toogleLike = async (req, res) => {
 
 
 // GET COMMENTS
-exports.getComments = async (req, res) => {
+export const getComments = async (req, res) => {
     try{
         const { videoId } = req.params; 
-        const comments = await knex("comments")
+        const comments = await db("comments")
         .join("users", "comments.user_id", "users.id")
         .select("comments.id", "comments.text", "comments.created_at", "users.username")
         .where("comments.video_id", videoId)
@@ -42,12 +46,12 @@ exports.getComments = async (req, res) => {
     }
 };
 //comment on video
-exports.addComment = async (req, res) => {
+export const addComment = async (req, res) => {
     try{
         const {videoId} = req.params;
         const {text} = req.body;
 
-        const [comment] = await knex("comments")
+        const [comment] = await db("comments")
         .insert({user_id: req.user.id,
             video_id: videoId,
             comment_text: text,
@@ -62,11 +66,11 @@ exports.addComment = async (req, res) => {
 };
 
 //watch history
-exports.addWatchHistory = async (req, res) => {
+export const addWatchHistory = async (req, res) => {
     try{
         const {videoId} = req.params;
 
-        await knex("watch_history").insert({
+        await db("watch_history").insert({
             user_id: req.user.id,
             video_id: videoId,
         });
@@ -76,3 +80,5 @@ exports.addWatchHistory = async (req, res) => {
         res.status(500).json({message: "server error"});
     }
 };
+
+export default { toogleLike, getComments, addComment, addWatchHistory };

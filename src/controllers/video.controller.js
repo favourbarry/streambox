@@ -1,7 +1,14 @@
-const knex = require("knex")(require("../../knexfile").development);
-const fs = require("fs");
-const path = require("path");
-exports.uploadVideo = async (req, res) => {
+import knex from "knex";
+import knexConfig from "../../knexfile.js";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from 'url';
+
+const db = knex(knexConfig.development);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export const uploadVideo = async (req, res) => {
     try{
         const {title, description } = req.body;
         if(!req.file){
@@ -9,7 +16,7 @@ exports.uploadVideo = async (req, res) => {
 
         }
         const videoPath = req.file.path;
-        const [Video] = await knex ("videos")
+        const [Video] = await db ("videos")
         .insert({
             title,
             description,
@@ -27,12 +34,12 @@ exports.uploadVideo = async (req, res) => {
 }
 };
 
-exports.getAllvideos = async(req, res) => {
+export const getAllvideos = async(req, res) => {
     try{
-        const videos = await knex("videos")
+        const videos = await db("videos")
         .join("users", "videos.user_id", "users.id")
         .select("videos.*",
-            "user.name as uploader"
+            "users.name as uploader"
         )
         .orderBy("videos.created_at", "desc");
         res.status(200).json(videos);
@@ -41,9 +48,9 @@ exports.getAllvideos = async(req, res) => {
     }
 };
 
-exports.getSingleVideo = async (req, res) => {
+export const getSingleVideo = async (req, res) => {
     try{
-        const video = await knex("videos")
+        const video = await db("videos")
         .join("users", "videos.user_id", "users.id")
         .select("videos.*", "users.name as user_name")
         .where("videos.id", req.params.id).first();
@@ -55,30 +62,32 @@ exports.getSingleVideo = async (req, res) => {
         return res.status(500).json({message: "Internal server error"});
     }
 };
-exports.deleteVideo = async (req, res) => {
+
+export const deleteVideo = async (req, res) => {
     try{
         const { id } = req.params;
 
-        const video = await knex("videos").where({ id }).first();
+        const video = await db("videos").where({ id }).first();
         if(!video){
             return res.status(404).json({message: "video not found"});
         }
         if(video.user_id !== req.user.id){
             return res.status(403).json({message: "user not found"});
         }
-        await knex("videos").where({id}).del();
+        await db("videos").where({id}).del();
 
         res.json({message: "video deleted successfully"});
     } catch (error) {
         res.status(500).json({message: "server error"});
     }
 };
-exports.streamVideo = async (req, res) => {
+
+export const streamVideo = async (req, res) => {
     try{
         const { id } = req.params;
 
         //get video from db
-        const video = await knex("videos").where({id}).first();
+        const video = await db("videos").where({id}).first();
         if(!video){
             return res.status(404).json({message: "video not found"});
         }
@@ -117,3 +126,5 @@ exports.streamVideo = async (req, res) => {
         res.status(500).json({message: "streaming error", error: error.message});
     }
 };
+
+export default { uploadVideo, getAllvideos, getSingleVideo, deleteVideo, streamVideo };

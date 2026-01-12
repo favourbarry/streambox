@@ -1,8 +1,11 @@
-const db = require("knex")(require("../../knexfile").development);
-const crypto = require("crypto");
+import knex from "knex";
+import knexConfig from "../../knexfile.js";
+import crypto from "crypto";
+
+const db = knex(knexConfig.development);
 
 //create livestream
-exports.createLivestream = async (req, res) => {
+export const createLivestream = async (req, res) => {
     try{
         const {title, description} = req.body;
         const streamkey = crypto.randomBytes(16).toString("hex");
@@ -14,13 +17,22 @@ exports.createLivestream = async (req, res) => {
             created_by: req.user.id,
         })
         .returning("*");
+          
+        await db("audit_logs").insert({
+            entity_type: 'stream',
+            action: 'created',
+            user_id: req.user.id,
+            created_at: db.fn.now(),
+        });
+
         res.status(201).json(livestream);
     } catch (error) {
         res.status(500).json({error: error.message});
     }
 };
+
 //start livestream
-exports.startLivestream = async (req, res) => {
+export const startLivestream = async (req, res) => {
     try{
         const id = req.params.id;
         await db("livestreams")
@@ -33,13 +45,21 @@ exports.startLivestream = async (req, res) => {
             event_type: "stream_started",
         });
 
+        await db("audit_logs").insert({
+            entity_type: 'stream',
+            action: 'started',
+            user_id: req.user.id,
+            created_at: db.fn.now(),
+        });
+
         res.json({message: "livestream started"});
     } catch (error){
         res.status(500).json({error: error.message});
     }
 };
+
 //get livestreams
-exports.getLivestreams = async (req, res) => {
+export const getLivestreams = async (req, res) => {
     try{
         const livestreams = await db("livestreams").select("*");
         res.json(livestreams);
@@ -47,8 +67,9 @@ exports.getLivestreams = async (req, res) => {
         res.status(500).json({error: error.message});
     }
 };
+
 //Join livestream
-exports.joinlivestream = async (req, res) => {
+export const joinlivestream = async (req, res) => {
     try {
         const {id} = req.params;
         const livestream = await db("livestreams")
@@ -65,6 +86,13 @@ exports.joinlivestream = async (req, res) => {
             event_type: "user_joined"
         });
         
+        await db("audit_logs").insert({
+            entity_type: 'stream',
+            action: 'joined',
+            user_id: req.user.id,
+            created_at: db.fn.now(),
+        });
+        
         res.json({message: "Joined livestream successfully", livestream});
     } catch (error) {
         res.status(500).json({error: error.message});
@@ -72,7 +100,7 @@ exports.joinlivestream = async (req, res) => {
 };
 
 //end livestream
-exports.endlivestream = async (req, res) =>{
+export const endlivestream = async (req, res) =>{
     try{
         const {id} = req.params;
 
@@ -85,8 +113,18 @@ exports.endlivestream = async (req, res) =>{
             user_id: req.user.id,
             event_type: "stream_ended",
         });
+
+        await db("audit_logs").insert({
+            entity_type: 'stream',
+            action: 'ended',
+            user_id: req.user.id,
+            created_at: db.fn.now(),
+        });
+
         res.json({message: "livestream ended"});
     } catch (error){
         res.status(500).json({error: error.message});
     }
 };
+
+export default { createLivestream, startLivestream, getLivestreams, joinlivestream, endlivestream };

@@ -1,4 +1,4 @@
-const { Model } = require('objection');
+import { Model } from '../db/objection.js';
 
 class Comment extends Model {
     static get tableName() {
@@ -10,4 +10,5 @@ class Comment extends Model {
     }
 }
 
-module.exports = { Comment };
+export { Comment };
+export default Comment;

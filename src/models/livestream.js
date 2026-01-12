@@ -1,4 +1,4 @@
-import { Model } from 'objection';
+import { Model } from '../db/objection.js';
 
 export class Livestream extends Model {
     static get tableName() {
@@ -8,7 +8,7 @@ export class Livestream extends Model {
         return 'id';
     }
     static get relationsMappings(){
-        const {LivestreamViewer} = require("./LivestreamViewer");
+        const {LivestreamViewer} = require("./LivestreamViewer.js");
         return {
             viewers: {
                 relation: Model.HasManyRelation,
@@ -21,3 +21,6 @@ export class Livestream extends Model {
         };
     }
 }
+
+
+export default Livestream;

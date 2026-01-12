@@ -1,8 +1,11 @@
-const db = require("knex")(require("../../knexfile").development);
-const crypto = require("crypto");
+import knex from "knex";
+import knexConfig from "../../knexfile.js";
+import crypto from "crypto";
+
+const db = knex(knexConfig.development);
 
 //generate stream key
-exports.createLivestream = async (req, res) => {
+export const createLivestream = async (req, res) => {
     try {
         const streamkey = crypto.randomBytes(16).toString("hex");
         const [livestream] = await db("livestreams").insert({
@@ -19,7 +22,7 @@ exports.createLivestream = async (req, res) => {
 };
    
 // Validate stream key (for OBS/streaming software)
-exports.validateStreamKey = async (req, res) => {
+export const validateStreamKey = async (req, res) => {
     try {
         if (!req.body || !req.body.stream_key) {
             return res.status(400).json({ message: "Stream key is required" });
@@ -46,7 +49,7 @@ exports.validateStreamKey = async (req, res) => {
 };
 
 // Get stream key for streamer (to use in OBS)
-exports.getStreamKey = async (req, res) => {
+export const getStreamKey = async (req, res) => {
     try {
         const { id } = req.params;
         
@@ -67,3 +70,5 @@ exports.getStreamKey = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+export default { createLivestream, validateStreamKey, getStreamKey };

@@ -1,4 +1,4 @@
-const { Model } = require('objection');
+import { Model } from '../db/objection.js';
 
 class WatchHistory extends Model {
     static get tableName() {
@@ -10,4 +10,5 @@ class WatchHistory extends Model {
     }
 }
 
-module.exports = { WatchHistory };
+export { WatchHistory };
+export default WatchHistory;
