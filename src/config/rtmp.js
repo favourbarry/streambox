@@ -1,5 +1,8 @@
-const NodeMediaServer = require('node-media-server');
-const db = require("knex")(require("../../knexfile").development);
+import NodeMediaServer from 'node-media-server';
+import knex from 'knex';
+import knexConfig from '../../knexfile.js';
+
+const db = knex(knexConfig.development);
 
 const config = {
   rtmp: {
@@ -47,6 +50,13 @@ nms.on('prePublish', async (id, StreamPath, args) => {
       event_type: "stream_connected",
       metadata: { stream_key: streamKey }
     });
+
+    await db("audit_logs").insert({
+      entity_type: 'stream',
+      action: 'started',
+      user_id: livestream.created_by,
+      created_at: db.fn.now(),
+    });
     
   } catch (error) {
     console.error('Error validating stream key:', error);
@@ -79,10 +89,17 @@ nms.on('donePublish', async (id, StreamPath, args) => {
         event_type: "stream_disconnected",
         metadata: { stream_key: streamKey }
       });
+
+      await db("audit_logs").insert({
+        entity_type: 'stream',
+        action: 'ended',
+        user_id: livestream.created_by,
+        created_at: db.fn.now(),
+      });
     }
   } catch (error) {
     console.error('Error handling stream end:', error);
   }
 });
 
-module.exports = nms;
+export default nms;

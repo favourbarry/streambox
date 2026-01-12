@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
+import auth from "../middlewares/auth.middleware.js";
+import * as livestreamController from "../controllers/livestream.controller.js";
+
 const router = express.Router();
-const auth = require("../middlewares/auth.middleware");
-const livestreamController = require("../controllers/livestream.controller");
 
 router.post("/create", auth, livestreamController.createLivestream);
 router.post("/:id/start", auth, livestreamController.startLivestream);
@@ -9,4 +10,4 @@ router.post("/:id/join", auth, livestreamController.joinlivestream);
 router.post("/:id/end", auth, livestreamController.endlivestream);
 router.get("/", livestreamController.getLivestreams);
 
-module.exports = router; 
+export default router; 

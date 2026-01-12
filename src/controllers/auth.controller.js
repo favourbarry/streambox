@@ -1,8 +1,11 @@
-const knex = require('knex')(require('../../knexfile').development);
-const bcrypt = require('bcrypt');
-const jwt = require("jsonwebtoken");
+import knex from 'knex';
+import knexConfig from '../../knexfile.js';
+import bcrypt from 'bcrypt';
+import jwt from "jsonwebtoken";
 
-exports.register = async (req, res) => {
+const db = knex(knexConfig.development);
+
+export const register = async (req, res) => {
     try {
         const {name, email, password} = req.body;
         //check if user exists
@@ -25,7 +28,7 @@ exports.register = async (req, res) => {
     }
 
 };
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
     try {
         const {email, password} = req.body;
         const user = await knex("users").where({email}).first();
@@ -52,3 +55,5 @@ exports.login = async (req, res) => {
         res.status(500).json({message: "server error"});
     }
 };
+
+export default { register, login };

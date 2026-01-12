@@ -5,18 +5,10 @@
 exports.up = function(knex) {
   return knex.schema.createTable("livestream_events", (table) => {
     table.increments("id").primary();
-    table
-      .integer("livestream_id")
-      .references("id")
-      .inTable("livestreams")
-      .onDelete("CASCADE");
-    table
-      .integer("user_id")
-      .references("id")
-      .inTable("users")
-      .onDelete("CASCADE");
+    table.integer("livestream_id").references("id").inTable("livestreams").onDelete("CASCADE");
+    table.integer("user_id").references("id").inTable("users").onDelete("CASCADE");
       table.string("event_type").notNullable();
-      table.jsonb("metadeta");
+      table.jsonb("metadata");
       table.timestamp("created_at").defaultTo(knex.fn.now());
   });
 };

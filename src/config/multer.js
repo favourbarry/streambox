@@ -1,6 +1,5 @@
-const express = require("express");
-const multer = require("multer");
-const path = require("path");
+import multer from "multer";
+import path from "path";
 
 const storage = multer.diskStorage({
     destination: "uploads/videos",
@@ -17,4 +16,6 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-module.exports = multer({ storage, fileFilter });
+const upload = multer({ storage, fileFilter });
+
+export default upload;

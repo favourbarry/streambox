@@ -1,4 +1,4 @@
-const { Model } = require('objection');
+import { Model } from '../db/objection.js';
 
 class Like extends Model {
     static get tableName() {
@@ -10,4 +10,5 @@ class Like extends Model {
     }
 }
 
-module.exports = { Like };
+export { Like };
+export default Like;
