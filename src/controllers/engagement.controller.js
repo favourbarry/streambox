@@ -24,7 +24,7 @@ export const toogleLike = async (req, res) => {
 
     }   catch (err){
         console.error(err);
-        res.status(500).json({message: "server error"});
+        res.status(500).json({message: "server error", error: err.message});
     }
 };
 //add comment
@@ -42,7 +42,7 @@ export const getComments = async (req, res) => {
         res.json(comments);
     } catch (err){
         console.error(err);
-        res.status(500).json({message: "server error"});
+        res.status(500).json({message: "server error", error: err.message});
     }
 };
 //comment on video
@@ -61,7 +61,7 @@ export const addComment = async (req, res) => {
 
     } catch(err){
         console.error(err);
-        res.status(500).json({message: "Server error"});
+        res.status(500).json({message: "Server error", error: err.message});
     }
 };
 
@@ -77,7 +77,8 @@ export const addWatchHistory = async (req, res) => {
         res.json({message: "Watch history updated"});
 
     } catch (err) {
-        res.status(500).json({message: "server error"});
+        console.error(err);
+        res.status(500).json({message: "server error", error: err.message});
     }
 };
 

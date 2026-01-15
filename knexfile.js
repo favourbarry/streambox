@@ -14,6 +14,17 @@ const config = {
         migrations: {
             directory: './migrations'
         },
+        useNullAsDefault: true
+    },
+    test: {
+        client: "sqlite3",
+        connection: {
+            filename: ":memory:"
+        },
+        migrations: {
+            directory: './migrations'
+        },
+        useNullAsDefault: true
     }
 };
 

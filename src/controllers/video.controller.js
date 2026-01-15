@@ -1,10 +1,10 @@
-import knex from "knex";
+import db from "../db/knex.js";
 import knexConfig from "../../knexfile.js";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
 
-const db = knex(knexConfig.development);
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 

@@ -36,12 +36,23 @@ app.get('/', (req, res) => {
     res.json({ message: "streambox api is running" });
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('ERROR:', err);
+    res.status(500).json({ 
+        message: "Internal server error", 
+        error: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+});
+
 server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+    console.log('Environment:', process.env.NODE_ENV || 'development');
 });
 
 // Start RTMP server
 rtmpServer.run();
 console.log('RTMP Server running on port 1935');
 
-export { app, io };
+export { app, io }; 

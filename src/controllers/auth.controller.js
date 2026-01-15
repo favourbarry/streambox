@@ -1,22 +1,21 @@
-import knex from 'knex';
+import db from "../db/knex.js"  ;
 import knexConfig from '../../knexfile.js';
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 
-const db = knex(knexConfig.development);
 
 export const register = async (req, res) => {
     try {
         const {name, email, password} = req.body;
         //check if user exists
-        const existingUser = await knex("users").where({email}).first();
+        const existingUser = await db("users").where({email}).first();
         if(existingUser) {
             return res.status(400).json({message: "User already exists"});
         }
         //hash password 
         const hashedPassword = await bcrypt.hash(password, 10);
         //create user
-        const [newUser] = await knex("users").insert({
+        const [newUser] = await db("users").insert({
             name,
             email,
             password: hashedPassword,
@@ -26,7 +25,7 @@ export const register = async (req, res) => {
     } catch (error) {
         res.status(500).json({message: "Server error", error: error.message});
     }
-
+;
 };
 export const login = async (req, res) => {
     try {
